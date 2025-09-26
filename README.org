@@ -1,1 +1,9 @@
-* My Doom Config
+#+title: mcpeaps_HD's Doom Emacs Config
+#+author: mcpeapsUnterstrichHD
+#+description: my personal Doom Emacs Config
+#+startup: showeverything
+#+options: toc:2
+
+* Table of Content :toc:
+
+https://mcpeapsunterstrichhd.dev/linkhub
