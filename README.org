@@ -5,5 +5,7 @@
 #+options: toc:2
 
 * Table of Content :toc:
+- [[#links][Links]]
 
+* Links
 https://mcpeapsunterstrichhd.dev/linkhub
