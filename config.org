@@ -19,6 +19,10 @@
 - [[#other][Other]]
 - [[#pdf][PDF]]
   - [[#disable-line-numbers][Disable Line Numbers]]
+- [[#github-copilot][Github Copilot]]
+  - [[#setup][Setup]]
+  - [[#on-request][On Request]]
+  - [[#on-notification][On Notification]]
 
 * Doom Settings
 
@@ -289,5 +293,66 @@ they are implemented.
 #+begin_src emacs-lisp
 
 (add-hook 'pdf-view-mode-hook #'(lamda () (interactive) (display-line-numbers-mode -1)))
+
+#+end_src
+
+* Github Copilot
+
+** Setup
+*** Normal
+
+#+begin_src emacs-lisp
+
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :hook (org-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+#+end_src
+*** Fallback
+
+#+begin_src emacs-lisp
+
+(after! (evil copilot)
+  ;; Define the custom function that either accepts the completion or does the default behavior
+  (defun my/copilot-tab-or-default ()
+    (interactive)
+    (if (and (bound-and-true-p copilot-mode)
+             ;; Add any other conditions to check for active copilot suggestions if necessary
+             )
+        (copilot-accept-completion)
+      (evil-insert 1))) ; Default action to insert a tab. Adjust as needed.
+
+  ;; Bind the custom function to <tab> in Evil's insert state
+  (evil-define-key 'insert 'global (kbd "<tab>") 'my/copilot-tab-or-default))
+
+#+end_src
+
+** On Request
+
+Register a handler to be called when a request of type method is received. Return JSON serializable as result or calling jsonrpc-error for errors. [readmore](https://www.gnu.org/software/emacs/manual/html_node/elisp/JSONRPC-Overview.html)
+
+Display desktop notification if emacs is built with d-bus
+
+#+begin_src emacs-lisp
+
+;; (copilot-on-request
+;;  'window/showMessageRequest
+;;  (lambda (msg) (notifications-notify :title "Emacs Copilot" :body (plist-get msg :message))))
+
+#+end_src
+
+** On Notification
+
+#+begin_src emacs-lisp
+
+;; (copilot-on-notification
+;;   'window/logMessage
+;;   (lambda (msg) (message (plist-get msg :message))
 
 #+end_src
