@@ -335,7 +335,7 @@ they are implemented.
 
 ** On Request
 
-Register a handler to be called when a request of type method is received. Return JSON serializable as result or calling jsonrpc-error for errors. [readmore](https://www.gnu.org/software/emacs/manual/html_node/elisp/JSONRPC-Overview.html)
+Register a handler to be called when a request of type method is received. Return JSON serializable as result or calling jsonrpc-error for errors. [[https://www.gnu.org/software/emacs/manual/html_node/elisp/JSONRPC-Overview.html][readmore]]
 
 Display desktop notification if emacs is built with d-bus
 
