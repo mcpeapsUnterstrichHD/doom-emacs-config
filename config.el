@@ -83,7 +83,63 @@
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
 
-(add-hook 'pdf-view-mode-hook #'(lamda () (interactive) (display-line-numbers-mode -1)))
+(defvar programmingLanguages
+  '(("java" . "java")
+    ("c" . "c")
+    ("cpp" . "cpp")
+    ("python" . "py")
+    ("javascript" . "js")
+    ("javascriptreact" . "jsx")
+    ("typescript" . "ts")
+    ("typescriptreact" . "tsx")
+    ("rust" . "rust")
+    ("html" . "html")
+    ("css" . "css")
+    ("swift" . "swift")
+    ("emacs-lisp" . "el")
+    ("sql" . "sql")))
+
+(setq-default indent-tabs-mode nil) ; keine Tabs, nur Spaces
+(setq-default tab-width 2)
+(setq-default standard-indent 2)
+
+(add-hook 'prog-mode-hook (lambda ()
+                            (setq-local indent-tabs-mode nil) ; keine Tabs, nur Spaces
+                            (setq-local tab-width 2)
+                            (setq-local standard-indent 2)))
+
+(add-hook 'python-mode-hook (lambda () (setq-local python-indent-offset 2)))
+(add-hook 'js-mode-hook     (lambda () (setq-local js-indent-level 2)))
+(add-hook 'typescript-mode-hook (lambda () (setq-local typescript-indent-level 2)))
+(add-hook 'c-mode-hook      (lambda () (setq-local c-basic-offset 2)))
+(add-hook 'c++-mode-hook    (lambda () (setq-local c-basic-offset 2)))
+(add-hook 'rust-mode-hook   (lambda () (setq-local rust-indent-offset 2)))
+(add-hook 'swift-mode-hook  (lambda () (setq-local swift-indent-offset 2)))
+(add-hook 'java-mode-hook   (lambda () (setq-local c-basic-offset 2)))
+(add-hook 'html-mode-hook   (lambda () (setq-local html-mode:basic-offset 2)))
+(add-hook 'css-mode-hook    (lambda () (setq-local css-indent-offset 2)))
+(add-hook 'elisp-mode-hook  (lambda () (setq-local lisp-indent-offset 2)))
+(add-hook 'org-mode-hook    (lambda () (setq-local org-indent-offset 2)))
+
+(after! copilot
+  (setq copilot-indent-offset-warning-disable t)
+
+  (setq copilot-major-mode-alist
+        '((python-mode . 2)
+          (js-mode . 2)
+          (typescript-mode . 2)
+          (c-mode . 2)
+          (c++-mode . 2)
+          (rust-mode . 2)
+          (swift-mode . 2)
+          (java-mode . 2)
+          (html-mode . 2)
+          (css-mode . 2)
+          (emacs-lisp-mode . 2)
+          (org-mode . 2)))
+)
+
+(add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
 
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
@@ -97,7 +153,7 @@
 
 (after! (evil copilot)
   ;; Define the custom function that either accepts the completion or does the default behavior
-  (defun my/copilot-tab-or-default ()
+  (defun mahd/copilot-tab-or-default ()
     (interactive)
     (if (and (bound-and-true-p copilot-mode)
              ;; Add any other conditions to check for active copilot suggestions if necessary
@@ -106,7 +162,7 @@
       (evil-insert 1))) ; Default action to insert a tab. Adjust as needed.
 
   ;; Bind the custom function to <tab> in Evil's insert state
-  (evil-define-key 'insert 'global (kbd "<tab>") 'my/copilot-tab-or-default))
+  (evil-define-key 'insert 'global (kbd "<tab>") 'mahd/copilot-tab-or-default))
 
 ;; (copilot-on-request
 ;;  'window/showMessageRequest
@@ -115,3 +171,13 @@
 ;; (copilot-on-notification
 ;;   'window/logMessage
 ;;   (lambda (msg) (message (plist-get msg :message))
+
+(after! copilot
+  (dolist (pair programmingLanguages)
+    (add-to-list 'copilot-major-mode-alist pair)))
+
+(after! copilot
+  (setq copilot-enable-predicates '(evil-insert-state-p)))
+
+(after! copilot
+  (setq copilot-enable-display-predicates '(copilot-display-predicate-evil-insert)))
