@@ -61,6 +61,15 @@
       (:prefix ("o" . "open here")
        :desc "Open vterm here"     "v" #'+vterm/here))
 
+(map! "<f5>"
+      :desc "Recompile" #'recompile)
+
+(map! :leader
+      (:prefix ("e" . "Eglot")
+       :desc "Code Actions" "a" #'eglot-code-actions
+       :desc "Format Buffer" "f" #'eglot-format-buffer
+       :desc "Start Eglot" "s" #'eglot))
+
 (after! doom-start
 (blink-cursor-mode 1))
 
@@ -78,10 +87,15 @@
 
 (setq org-directory "~/org/")
 
+(add-hook 'org-mode-hook #'org-modern-mode)
+
 (setq org-modern-table-vertical 1)
 (setq org-modern-table t)
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
+
+(after! eglot
+  (add-to-list 'eglot-server-programs '(rustic-mode . ("rust-analyzer"))))
 
 (defvar programmingLanguages
   '(("java" . "java")
@@ -116,7 +130,8 @@
 (add-hook 'rust-mode-hook   (lambda () (setq-local rust-indent-offset 2)))
 (add-hook 'swift-mode-hook  (lambda () (setq-local swift-indent-offset 2)))
 (add-hook 'java-mode-hook   (lambda () (setq-local c-basic-offset 2)))
-(add-hook 'html-mode-hook   (lambda () (setq-local html-mode:basic-offset 2)))
+(add-hook 'html-mode-hook   (lambda () (setq-local sgml-basic-offset 2)))
+(add-hook 'web-mode-hook   (lambda () (setq-local web-mode-markup-indent-offset 2)))
 (add-hook 'css-mode-hook    (lambda () (setq-local css-indent-offset 2)))
 (add-hook 'elisp-mode-hook  (lambda () (setq-local lisp-indent-offset 2)))
 (add-hook 'org-mode-hook    (lambda () (setq-local org-indent-offset 2)))
@@ -159,7 +174,7 @@
              ;; Add any other conditions to check for active copilot suggestions if necessary
              )
         (copilot-accept-completion)
-      (evil-insert 1))) ; Default action to insert a tab. Adjust as needed.
+      (indent-for-tab-command))) ; Default action to insert a tab. Adjust as needed.
 
   ;; Bind the custom function to <tab> in Evil's insert state
   (evil-define-key 'insert 'global (kbd "<tab>") 'mahd/copilot-tab-or-default))
@@ -181,3 +196,6 @@
 
 (after! copilot
   (setq copilot-enable-display-predicates '(copilot-display-predicate-evil-insert)))
+
+(add-hook 'rustic-mode-hook
+          (lambda () (eglot-ensure)))
