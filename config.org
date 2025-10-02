@@ -194,7 +194,7 @@ numbers are disabled. For relative line numbers, set this to `relative'.
 
 #+end_src
 
-*** Recompile
+*** Compile
 
 #+begin_src emacs-lisp
 
@@ -212,6 +212,16 @@ numbers are disabled. For relative line numbers, set this to `relative'.
        :desc "Code Actions" "a" #'eglot-code-actions
        :desc "Format Buffer" "f" #'eglot-format-buffer
        :desc "Start Eglot" "s" #'eglot))
+
+#+end_src
+
+*** Git
+
+#+begin_src emacs-lisp
+
+(map! :leader
+      (:prefix ("g" . "git")
+       :desc "Magit Push" "p" #'magit-push))
 
 #+end_src
 

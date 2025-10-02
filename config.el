@@ -70,6 +70,10 @@
        :desc "Format Buffer" "f" #'eglot-format-buffer
        :desc "Start Eglot" "s" #'eglot))
 
+(map! :leader
+      (:prefix ("g" . "git")
+       :desc "Magit Push" "p" #'magit-push))
+
 (after! doom-start
 (blink-cursor-mode 1))
 
