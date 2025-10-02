@@ -199,7 +199,7 @@ numbers are disabled. For relative line numbers, set this to `relative'.
 #+begin_src emacs-lisp
 
 (map! "<f5>"
-      :desc "Recompile" #'recompile)
+      :desc "Compile" #'compile)
 
 #+end_src
 

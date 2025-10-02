@@ -62,7 +62,7 @@
        :desc "Open vterm here"     "v" #'+vterm/here))
 
 (map! "<f5>"
-      :desc "Recompile" #'recompile)
+      :desc "Compile" #'compile)
 
 (map! :leader
       (:prefix ("e" . "Eglot")
