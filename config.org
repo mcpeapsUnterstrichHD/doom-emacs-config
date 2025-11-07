@@ -12,11 +12,15 @@
   - [[#line-numbers][Line Numbers]]
   - [[#shortcuts][Shortcuts]]
   - [[#blinking-cursor][Blinking Cursor]]
+  - [[#shell-exec][Shell exec]]
 - [[#org-mode-settings][Org mode Settings]]
   - [[#org-directory][Org Directory]]
   - [[#modern-org-mode][Modern Org Mode]]
   - [[#modern-table][Modern Table]]
   - [[#highlighting][Highlighting]]
+  - [[#inline-latex][Inline LaTeX]]
+  - [[#export-with-latex][Export with LaTeX]]
+  - [[#toggle-preview][Toggle Preview]]
 - [[#eglot][Eglot]]
   - [[#code-servers][Code servers]]
 - [[#other][Other]]
@@ -24,6 +28,8 @@
   - [[#indentation-settings][Indentation Settings]]
 - [[#pdf][PDF]]
   - [[#disable-line-numbers][Disable Line Numbers]]
+  - [[#dark-mode][Dark mode]]
+  - [[#printed-mode][Printed Mode]]
 - [[#github-copilot][Github Copilot]]
   - [[#setup][Setup]]
   - [[#on-request][On Request]]
@@ -32,6 +38,7 @@
   - [[#prediction-list][Prediction List]]
 - [[#programming-settings][Programming Settings]]
   - [[#rust][Rust]]
+  - [[#latex][LaTeX]]
 
 * Doom Settings
 
@@ -185,7 +192,11 @@ numbers are disabled. For relative line numbers, set this to `relative'.
        :desc "Toggle markdown-view-mode"      "m" #'mahd/toggle-markdown-view-mode
        :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines
        :desc "Toggle treemacs"                "T" #'+treemacs/toggle
-       :desc "Toggle vterm split"             "v" #'+vterm/toggle))
+       :desc "Toggle vterm split"             "v" #'+vterm/toggle
+        (:prefix ("p" . "PDF")
+         :desc "Toggle Dark Mode"              "d" #'pdf-view-midnight-minor-mode
+         :desc "Toggle Printed Mode"           "p" #'pdf-view-printer-minor-mode)))
+
 
 (map! :leader
       (:prefix ("o" . "open here")
@@ -262,6 +273,19 @@ numbers are disabled. For relative line numbers, set this to `relative'.
 
 #+end_src
 
+** Shell exec
+
+ensure Emacs GUI inherits your shell PATH (macOS)
+
+#+begin_src emacs-lisp
+
+(after! exec-path-from-shell
+  (when (memq window-system '(mac ns))
+    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (exec-path-from-shell-initialize)))
+
+#+end_src
+
 * Org mode Settings
 
 ** Org Directory
@@ -300,6 +324,68 @@ change `org-directory'. It must be set before org loads!
 
 #+end_src
 
+** Inline LaTeX
+
+LaTeX inline-Preview & Export (Doom Emacs)
+
+*** Generate Preview
+
+automatisch bei Öffnen LaTeX-Previews erzeugen (optional)
+Setze auf nil, wenn du beim Öffnen automatisch Previews nicht wünschst
+
+#+begin_src emacs-lisp
+
+(after! org
+  (setq org-startup-with-latex-preview t))
+
+#+end_src
+
+*** Generate Formula SVGs
+
+Welches Programm zum Erzeugen von Formeln: 'dvisvgm, 'imagemagick oder 'dvipng
+dvisvgm ist empfohlen (SVGs skalieren sauber)
+
+#+begin_src emacs-lisp
+
+(after! org
+  (setq org-latex-create-formula-image-program 'dvisvgm))
+
+#+end_src
+
+**** Options
+
+Optionen für das gerenderte Bild (Skalierung, Hintergrund etc.)
+
+#+begin_src emacs-lisp
+
+(after! org
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :scale 1.0)))
+
+#+end_src
+
+** Export with LaTeX
+
+Latexmk mit LuaLaTeX (wenn du lualatex bevorzugst)
+
+#+begin_src emacs-lisp
+
+(after! org
+  (setq org-latex-pdf-process
+        '("latexmk -pdf -pdflatex=\"lualatex -interaction=nonstopmode -synctex=1 %O %S\" -use-make -f %f")))
+
+#+end_src
+
+** Toggle Preview
+
+toggled Previews beim Editieren automatisch
+
+#+begin_src emacs-lisp
+
+(use-package! org-fragtog
+  :hook (org-mode . org-fragtog-mode))
+
+#+end_src
 
 * Eglot
 
@@ -448,6 +534,23 @@ Häufige Modes explizit
 
 #+end_src
 
+** Dark mode
+
+#+begin_src emacs-lisp
+
+(add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
+
+#+end_src
+
+** Printed Mode
+
+#+begin_src emacs-lisp
+
+(add-hook 'pdf-view-mode-hook #'pdf-view-printer-minor-mode)
+
+#+end_src
+
+
 * Github Copilot
 
 ** Setup
@@ -556,3 +659,149 @@ Wenn du die Liste sehen willst
           (lambda () (eglot-ensure)))
 
 #+end_src
+
+** LaTeX
+
+*** AUCTeX
+
+AUCTeX / LaTeX Einstellungen (after! tex stellt sicher, dass AUCTeX geladen ist)
+
+**** General
+
+#+begin_src emacs-lisp
+
+(after! tex
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-save-query nil
+        TeX-PDF-mode t            ; PDF statt DVI
+        ;; Standard-Engine: luatex für Unicode, Systemfonts & Lua-Erweiterbarkeit
+        TeX-engine 'luatex
+        ;; Quelle<->PDF Synchronisation via SyncTeX
+        TeX-source-correlate-method 'synctex
+        TeX-source-correlate-mode t
+        TeX-source-correlate-start-server t))
+
+#+end_src
+
+**** LatexMk
+
+Latexmk mit LuaLaTeX als Compiler konfigurieren
+
+#+begin_src emacs-lisp
+
+(after! tex
+  ;; Entferne alte LatexMk-Definition falls vorhanden
+  (setq TeX-command-list (assoc-delete-all "LatexMk" TeX-command-list))
+
+  ;; Füge LatexMk mit LuaLaTeX hinzu
+  (add-to-list 'TeX-command-list
+               '("LatexMk" "latexmk -pdf -pdflatex=\"lualatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with LuaLaTeX"))
+
+  (setq TeX-command-default "LatexMk"))
+
+#+end_src
+
+**** RefTeX
+
+#+begin_src emacs-lisp
+
+(after! tex
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t))
+
+#+end_src
+
+**** Company Mode
+
+#+begin_src emacs-lisp
+
+(after! tex
+  (add-hook 'LaTeX-mode-hook #'company-mode))
+
+#+end_src
+
+**** PDF
+
+***** Viewer
+
+PDF Tools als Standard-Viewer (mit SyncTeX-Support)
+
+#+begin_src emacs-lisp
+
+(after! tex
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (setq TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))))
+
+#+end_src
+
+**** Zusätzliche Engines
+
+Für Fallback oder per-file Engine-Wahl (XeLaTeX, pdfLaTeX)
+
+#+begin_src emacs-lisp
+
+(after! tex
+  ;; Weitere Engine-Optionen verfügbar machen
+  (add-to-list 'TeX-command-list
+               '("XeLaTeX" "latexmk -pdf -pdflatex=\"xelatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with XeLaTeX"))
+
+  (add-to-list 'TeX-command-list
+               '("pdfLaTeX" "latexmk -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with pdfLaTeX")))
+
+#+end_src
+
+**** Tastenkürzel
+
+Zusätzliche LaTeX-spezifische Keybindings
+
+#+begin_src emacs-lisp
+
+(map! :map LaTeX-mode-map
+      :localleader
+      :desc "View PDF" "v" #'TeX-view
+      :desc "Compile" "c" #'TeX-command-master
+      :desc "Clean" "k" #'TeX-clean
+      :desc "Insert Macro" "m" #'TeX-insert-macro
+      :desc "Insert Environment" "e" #'LaTeX-environment
+      :desc "Close Environment" "E" #'LaTeX-close-environment
+      :desc "Insert Section" "s" #'LaTeX-section
+      :desc "RefTeX citation" "r c" #'reftex-citation
+      :desc "RefTeX reference" "r r" #'reftex-reference
+      :desc "RefTeX label" "r l" #'reftex-label
+      :desc "RefTeX TOC" "r t" #'reftex-toc)
+
+#+end_src
+
+**** LaTeX Indentation
+
+#+begin_src emacs-lisp
+
+(add-hook 'LaTeX-mode-hook (lambda ()
+                             (setq-local LaTeX-indent-level 2)
+                             (setq-local LaTeX-item-indent 0)))
+
+#+end_src
+
+**** Copilot in LaTeX
+
+#+begin_src emacs-lisp
+
+(after! copilot
+  (add-to-list 'copilot-major-mode-alist '("latex" . "tex")))
+
+#+end_src
+
+*** PATH for TeX
+
+#+begin_src emacs-lisp
+
+(when (memq window-system '(mac ns))
+  (setenv "PATH" (concat "/Library/TeX/texbin:" (getenv "PATH")))
+  (add-to-list 'exec-path "/Library/TeX/texbin"))
+
+#+end_src
+

@@ -48,8 +48,17 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 
+(package! exec-path-from-shell)
+
 (package! tldr)
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 (package! eglot)
 (package! org-modern)
+(package! pdf-tools)
+(package! company-auctex)
+(package! org-fragtog)            ;; <-- neu: toggled LaTeX-Previews beim Editieren
+;; Für Zitat-Completion: wähle eines
+(package! ivy-bibtex) ;; wenn du ivy/Counsel nutzt
+;; oder
+(package! citar)      ;; modernes, backend-unabhängiges Zitations-UI

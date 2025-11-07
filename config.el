@@ -55,7 +55,11 @@
        :desc "Toggle markdown-view-mode"      "m" #'mahd/toggle-markdown-view-mode
        :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines
        :desc "Toggle treemacs"                "T" #'+treemacs/toggle
-       :desc "Toggle vterm split"             "v" #'+vterm/toggle))
+       :desc "Toggle vterm split"             "v" #'+vterm/toggle
+        (:prefix ("p" . "PDF")
+         :desc "Toggle Dark Mode"              "d" #'pdf-view-midnight-minor-mode
+         :desc "Toggle Printed Mode"           "p" #'pdf-view-printer-minor-mode)))
+
 
 (map! :leader
       (:prefix ("o" . "open here")
@@ -89,6 +93,11 @@
 (after! doom-start
 (setq blink-cursor-interval 0.5))
 
+(after! exec-path-from-shell
+  (when (memq window-system '(mac ns))
+    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (exec-path-from-shell-initialize)))
+
 (setq org-directory "~/org/")
 
 (add-hook 'org-mode-hook #'org-modern-mode)
@@ -97,6 +106,23 @@
 (setq org-modern-table t)
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
+
+(after! org
+  (setq org-startup-with-latex-preview t))
+
+(after! org
+  (setq org-latex-create-formula-image-program 'dvisvgm))
+
+(after! org
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :scale 1.0)))
+
+(after! org
+  (setq org-latex-pdf-process
+        '("latexmk -pdf -pdflatex=\"lualatex -interaction=nonstopmode -synctex=1 %O %S\" -use-make -f %f")))
+
+(use-package! org-fragtog
+  :hook (org-mode . org-fragtog-mode))
 
 (after! eglot
   (add-to-list 'eglot-server-programs '(rustic-mode . ("rust-analyzer"))))
@@ -160,6 +186,10 @@
 
 (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
 
+(add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
+
+(add-hook 'pdf-view-mode-hook #'pdf-view-printer-minor-mode)
+
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
@@ -203,3 +233,72 @@
 
 (add-hook 'rustic-mode-hook
           (lambda () (eglot-ensure)))
+
+(after! tex
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-save-query nil
+        TeX-PDF-mode t            ; PDF statt DVI
+        ;; Standard-Engine: luatex für Unicode, Systemfonts & Lua-Erweiterbarkeit
+        TeX-engine 'luatex
+        ;; Quelle<->PDF Synchronisation via SyncTeX
+        TeX-source-correlate-method 'synctex
+        TeX-source-correlate-mode t
+        TeX-source-correlate-start-server t))
+
+(after! tex
+  ;; Entferne alte LatexMk-Definition falls vorhanden
+  (setq TeX-command-list (assoc-delete-all "LatexMk" TeX-command-list))
+
+  ;; Füge LatexMk mit LuaLaTeX hinzu
+  (add-to-list 'TeX-command-list
+               '("LatexMk" "latexmk -pdf -pdflatex=\"lualatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with LuaLaTeX"))
+
+  (setq TeX-command-default "LatexMk"))
+
+(after! tex
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t))
+
+(after! tex
+  (add-hook 'LaTeX-mode-hook #'company-mode))
+
+(after! tex
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (setq TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))))
+
+(after! tex
+  ;; Weitere Engine-Optionen verfügbar machen
+  (add-to-list 'TeX-command-list
+               '("XeLaTeX" "latexmk -pdf -pdflatex=\"xelatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with XeLaTeX"))
+
+  (add-to-list 'TeX-command-list
+               '("pdfLaTeX" "latexmk -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
+                 TeX-run-TeX nil t :help "Run LatexMk with pdfLaTeX")))
+
+(map! :map LaTeX-mode-map
+      :localleader
+      :desc "View PDF" "v" #'TeX-view
+      :desc "Compile" "c" #'TeX-command-master
+      :desc "Clean" "k" #'TeX-clean
+      :desc "Insert Macro" "m" #'TeX-insert-macro
+      :desc "Insert Environment" "e" #'LaTeX-environment
+      :desc "Close Environment" "E" #'LaTeX-close-environment
+      :desc "Insert Section" "s" #'LaTeX-section
+      :desc "RefTeX citation" "r c" #'reftex-citation
+      :desc "RefTeX reference" "r r" #'reftex-reference
+      :desc "RefTeX label" "r l" #'reftex-label
+      :desc "RefTeX TOC" "r t" #'reftex-toc)
+
+(add-hook 'LaTeX-mode-hook (lambda ()
+                             (setq-local LaTeX-indent-level 2)
+                             (setq-local LaTeX-item-indent 0)))
+
+(after! copilot
+  (add-to-list 'copilot-major-mode-alist '("latex" . "tex")))
+
+(when (memq window-system '(mac ns))
+  (setenv "PATH" (concat "/Library/TeX/texbin:" (getenv "PATH")))
+  (add-to-list 'exec-path "/Library/TeX/texbin"))
