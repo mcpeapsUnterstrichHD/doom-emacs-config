@@ -62,3 +62,5 @@
 (package! ivy-bibtex) ;; wenn du ivy/Counsel nutzt
 ;; oder
 (package! citar)      ;; modernes, backend-unabhängiges Zitations-UI
+
+(package! org-inline-pdf) ;; Inline pdfs in Org-mode

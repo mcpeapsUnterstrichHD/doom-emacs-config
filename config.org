@@ -21,6 +21,7 @@
   - [[#inline-latex][Inline LaTeX]]
   - [[#export-with-latex][Export with LaTeX]]
   - [[#toggle-preview][Toggle Preview]]
+  - [[#embed-pdfs][Embed PDFs]]
 - [[#eglot][Eglot]]
   - [[#code-servers][Code servers]]
 - [[#other][Other]]
@@ -384,6 +385,14 @@ toggled Previews beim Editieren automatisch
 
 (use-package! org-fragtog
   :hook (org-mode . org-fragtog-mode))
+
+#+end_src
+
+** Embed PDFs
+
+#+begin_src emacs-lisp
+
+(add-hook 'org-mode-hook #'org-inline-pdf-mode)
 
 #+end_src
 

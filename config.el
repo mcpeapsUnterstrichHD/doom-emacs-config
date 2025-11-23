@@ -124,6 +124,8 @@
 (use-package! org-fragtog
   :hook (org-mode . org-fragtog-mode))
 
+(add-hook 'org-mode-hook #'org-inline-pdf-mode)
+
 (after! eglot
   (add-to-list 'eglot-server-programs '(rustic-mode . ("rust-analyzer"))))
 
