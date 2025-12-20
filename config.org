@@ -40,6 +40,7 @@
 - [[#programming-settings][Programming Settings]]
   - [[#rust][Rust]]
   - [[#latex][LaTeX]]
+- [[#tidalcycles][TidalCycles]]
 
 * Doom Settings
 
@@ -814,3 +815,10 @@ Zusätzliche LaTeX-spezifische Keybindings
 
 #+end_src
 
+* TidalCycles
+
+#+begin_src emacs-lisp
+
+(setq tidal-boot-script-path "~/.cabal/share/aarch64-osx-ghc-9.12.2-ea3d/tidal-1.10.1/BootTidal.hs")
+
+#+end_src

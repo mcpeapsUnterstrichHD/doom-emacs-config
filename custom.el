@@ -8,7 +8,9 @@
  '(custom-safe-themes
    '("fd22a3aac273624858a4184079b7134fb4e97104d1627cb2b488821be765ff17" default))
  '(pdf-view-display-size 'fit-page)
- '(pdf-view-use-imagemagick t))
+ '(pdf-view-use-imagemagick t)
+ '(tool-bar-always-show-default t)
+ '(tool-bar-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

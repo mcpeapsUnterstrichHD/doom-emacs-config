@@ -64,3 +64,5 @@
 (package! citar)      ;; modernes, backend-unabhängiges Zitations-UI
 
 (package! org-inline-pdf) ;; Inline pdfs in Org-mode
+
+(package! tidal) ;;

@@ -304,3 +304,5 @@
 (when (memq window-system '(mac ns))
   (setenv "PATH" (concat "/Library/TeX/texbin:" (getenv "PATH")))
   (add-to-list 'exec-path "/Library/TeX/texbin"))
+
+(setq tidal-boot-script-path "~/.cabal/share/aarch64-osx-ghc-9.12.2-ea3d/tidal-1.10.1/BootTidal.hs")
