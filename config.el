@@ -1,3 +1,15 @@
+;; Early PATH setup for GUI launch (Spotlight/Raycast)
+;; This ensures essential paths are available before any other code runs
+(when (memq window-system '(mac ns))
+  (dolist (path '("/opt/homebrew/bin"
+                  "/opt/homebrew/sbin"
+                  "/Library/TeX/texbin"
+                  "/usr/local/bin"))
+    (unless (member path exec-path)
+      (push path exec-path))
+    (unless (string-match-p path (getenv "PATH"))
+      (setenv "PATH" (concat path ":" (getenv "PATH"))))))
+
 (setq user-full-name "mcpeapsUnterstrichHD"
       user-mail-address "mcpeaps_HD@outlook.com")
 
@@ -93,10 +105,18 @@
 (after! doom-start
 (setq blink-cursor-interval 0.5))
 
+;; Use Zsh for environment loading to avoid Xonsh freezes
+(setq shell-file-name "/bin/zsh") ; Global shell for subprocesses
+
 (after! exec-path-from-shell
   (when (memq window-system '(mac ns))
+    (setq exec-path-from-shell-shell-name "/bin/zsh")
     (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
     (exec-path-from-shell-initialize)))
+
+;; Ensure vterm uses Xonsh explicitly
+(after! vterm
+  (setq vterm-shell "/Users/mahd/.local/xonsh-env/xbin/xonsh"))
 
 (setq org-directory "~/org/")
 
@@ -108,7 +128,7 @@
 (add-hook 'org-mode-hook #'hl-todo-mode)
 
 (after! org
-  (setq org-startup-with-latex-preview t))
+  (setq org-startup-with-latex-preview nil))
 
 (after! org
   (setq org-latex-create-formula-image-program 'dvisvgm))
@@ -280,23 +300,25 @@
                '("pdfLaTeX" "latexmk -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -synctex=1 %%O %%S\" %s"
                  TeX-run-TeX nil t :help "Run LatexMk with pdfLaTeX")))
 
-(map! :map LaTeX-mode-map
-      :localleader
-      :desc "View PDF" "v" #'TeX-view
-      :desc "Compile" "c" #'TeX-command-master
-      :desc "Clean" "k" #'TeX-clean
-      :desc "Insert Macro" "m" #'TeX-insert-macro
-      :desc "Insert Environment" "e" #'LaTeX-environment
-      :desc "Close Environment" "E" #'LaTeX-close-environment
-      :desc "Insert Section" "s" #'LaTeX-section
-      :desc "RefTeX citation" "r c" #'reftex-citation
-      :desc "RefTeX reference" "r r" #'reftex-reference
-      :desc "RefTeX label" "r l" #'reftex-label
-      :desc "RefTeX TOC" "r t" #'reftex-toc)
+(after! tex
+  (map! :map LaTeX-mode-map
+        :localleader
+        :desc "View PDF" "v" #'TeX-view
+        :desc "Compile" "c" #'TeX-command-master
+        :desc "Clean" "k" #'TeX-clean
+        :desc "Insert Macro" "m" #'TeX-insert-macro
+        :desc "Insert Environment" "e" #'LaTeX-environment
+        :desc "Close Environment" "E" #'LaTeX-close-environment
+        :desc "Insert Section" "s" #'LaTeX-section
+        :desc "RefTeX citation" "r c" #'reftex-citation
+        :desc "RefTeX reference" "r r" #'reftex-reference
+        :desc "RefTeX label" "r l" #'reftex-label
+        :desc "RefTeX TOC" "r t" #'reftex-toc))
 
-(add-hook 'LaTeX-mode-hook (lambda ()
-                             (setq-local LaTeX-indent-level 2)
-                             (setq-local LaTeX-item-indent 0)))
+(after! tex
+  (add-hook 'LaTeX-mode-hook (lambda ()
+                               (setq-local LaTeX-indent-level 2)
+                               (setq-local LaTeX-item-indent 0))))
 
 (after! copilot
   (add-to-list 'copilot-major-mode-alist '("latex" . "tex")))
@@ -306,3 +328,7 @@
   (add-to-list 'exec-path "/Library/TeX/texbin"))
 
 (setq tidal-boot-script-path "~/.cabal/share/aarch64-osx-ghc-9.12.2-ea3d/tidal-1.10.1/BootTidal.hs")
+
+(after! projectile
+  (setq projectile-project-root-files-bottom-up
+        (remove ".git" projectile-project-root-files-bottom-up)))
