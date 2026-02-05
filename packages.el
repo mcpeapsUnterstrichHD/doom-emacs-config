@@ -66,3 +66,5 @@
 (package! org-inline-pdf) ;; Inline pdfs in Org-mode
 
 (package! tidal) ;;
+(package! ox-gfm);;
+

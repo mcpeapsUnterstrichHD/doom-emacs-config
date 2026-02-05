@@ -146,6 +146,11 @@
 
 (add-hook 'org-mode-hook #'org-inline-pdf-mode)
 
+(eval-after-load "org"
+  '(require 'ox-gfm nil t))
+
+(setq org-export-with-broken-links t)
+
 (after! eglot
   (add-to-list 'eglot-server-programs '(rustic-mode . ("rust-analyzer"))))
 

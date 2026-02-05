@@ -22,6 +22,8 @@
   - [[#export-with-latex][Export with LaTeX]]
   - [[#toggle-preview][Toggle Preview]]
   - [[#embed-pdfs][Embed PDFs]]
+  - [[#markdown-export][Markdown export]]
+  - [[#export-with-broken-links][Export with broken Links]]
 - [[#eglot][Eglot]]
   - [[#code-servers][Code servers]]
 - [[#other][Other]]
@@ -415,6 +417,23 @@ toggled Previews beim Editieren automatisch
 #+begin_src emacs-lisp
 
 (add-hook 'org-mode-hook #'org-inline-pdf-mode)
+
+#+end_src
+
+** Markdown export
+
+#+begin_src emacs-lisp
+
+(eval-after-load "org"
+  '(require 'ox-gfm nil t))
+
+#+end_src
+
+** Export with broken Links
+
+#+begin_src emacs-lisp
+
+(setq org-export-with-broken-links t)
 
 #+end_src
 
