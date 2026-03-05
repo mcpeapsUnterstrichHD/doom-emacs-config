@@ -110,13 +110,13 @@
 
 (after! exec-path-from-shell
   (when (memq window-system '(mac ns))
-    (setq exec-path-from-shell-shell-name "/bin/zsh")
+    (setq exec-path-from-shell-shell-name "/opt/homebrew/bin/fish")
     (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
     (exec-path-from-shell-initialize)))
 
-;; Ensure vterm uses Xonsh explicitly
+;; Ensure vterm uses Fish explicitly
 (after! vterm
-  (setq vterm-shell "/Users/mahd/.local/xonsh-env/xbin/xonsh"))
+  (setq vterm-shell "/opt/homebrew/bin/fish"))
 
 (setq org-directory "~/org/")
 
