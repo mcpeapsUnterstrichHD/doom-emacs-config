@@ -106,12 +106,12 @@
 (setq blink-cursor-interval 0.5))
 
 ;; Use Zsh for environment loading to avoid Xonsh freezes
-(setq shell-file-name "/opt/homebrew/bin/fish") ; Global shell for subprocesses
+(setq shell-file-name "/bin/zsh") ; Global shell for subprocesses
 
 (after! exec-path-from-shell
   (when (memq window-system '(mac ns))
-    (setq exec-path-from-shell-shell-name "/opt/homebrew/bin/fish")
-    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (setq exec-path-from-shell-shell-name "/bin/zsh")
+    (setq exec-path-from-shell-variables '("PATH" "MANPATH" "PKG_CONFIG_PATH"))
     (exec-path-from-shell-initialize)))
 
 ;; Ensure vterm uses Fish explicitly
@@ -122,6 +122,8 @@
         (concat
          "/opt/homebrew/lib/pkgconfig:"
          "/opt/homebrew/opt/libpng/lib/pkgconfig:"
+         "/opt/homebrew/opt/bzip2/lib/pkgconfig:"
+         "/opt/homebrew/opt/freetype2/lib/pkgconfig:"
          (or (getenv "PKG_CONFIG_PATH") "")))
 
 (setq org-directory "~/org/")
