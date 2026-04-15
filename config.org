@@ -13,6 +13,7 @@
   - [[#shortcuts][Shortcuts]]
   - [[#blinking-cursor][Blinking Cursor]]
   - [[#shell-exec][Shell exec]]
+  - [[#paths][PATHS]]
 - [[#org-mode-settings][Org mode Settings]]
   - [[#org-directory][Org Directory]]
   - [[#modern-org-mode][Modern Org Mode]]
@@ -297,7 +298,7 @@ ensure Emacs GUI inherits your shell PATH (macOS)
 #+begin_src emacs-lisp
 
 ;; Use Zsh for environment loading to avoid Xonsh freezes
-(setq shell-file-name "/bin/zsh") ; Global shell for subprocesses
+(setq shell-file-name "/opt/homebrew/bin/fish") ; Global shell for subprocesses
 
 (after! exec-path-from-shell
   (when (memq window-system '(mac ns))
@@ -308,6 +309,18 @@ ensure Emacs GUI inherits your shell PATH (macOS)
 ;; Ensure vterm uses Fish explicitly
 (after! vterm
   (setq vterm-shell "/opt/homebrew/bin/fish"))
+
+#+end_src
+
+** PATHS
+
+#+begin_src emacs-lisp
+
+(setenv "PKG_CONFIG_PATH"
+        (concat
+         "/opt/homebrew/lib/pkgconfig:"
+         "/opt/homebrew/opt/libpng/lib/pkgconfig:"
+         (or (getenv "PKG_CONFIG_PATH") "")))
 
 #+end_src
 
