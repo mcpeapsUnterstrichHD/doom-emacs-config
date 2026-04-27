@@ -291,6 +291,8 @@
                  TeX-run-TeX nil t :help "Run LatexMk with LuaLaTeX"))
 
   (setq TeX-command-default "LatexMk"))
+  
+  (setq-default TeX-engine 'luatex)
 
 (after! tex
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)

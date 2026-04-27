@@ -766,6 +766,8 @@ Latexmk mit LuaLaTeX als Compiler konfigurieren
                  TeX-run-TeX nil t :help "Run LatexMk with LuaLaTeX"))
 
   (setq TeX-command-default "LatexMk"))
+  
+  (setq-default TeX-engine 'luatex)
 
 #+end_src
 
